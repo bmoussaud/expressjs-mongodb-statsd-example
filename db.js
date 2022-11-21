@@ -6,7 +6,12 @@ var Values = mongoose.model('values', schema);
 
 module.exports = {
     connectDB : function() {
-        mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
+        if ("MONGODB_ADDON_URI" in process.env) {
+            console.log('Connecting using MONGODB_ADDON_URI env: '+process.env.MONGODB_ADDON_URI);            
+            mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
+        } else {
+            console.log('Connecting NOT using MONGODB_ADDON_URI env, Service Binding....');
+        }
     },
 
     updateGauge : function() {
