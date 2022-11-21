@@ -1,29 +1,42 @@
 var mongoose = require('mongoose');
 var statsd = require('./statsd');
+const serviceBindings = require('kube-service-bindings');
+const { options } = require('mongoose');
 
-var schema = mongoose.Schema({value: String});
+
+var schema = mongoose.Schema({ value: String });
 var Values = mongoose.model('values', schema);
 
 module.exports = {
-    connectDB : function() {
+    connectDB: function () {
         if ("MONGODB_ADDON_URI" in process.env) {
-            console.log('Connecting using MONGODB_ADDON_URI env: '+process.env.MONGODB_ADDON_URI);            
+            console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
             console.log('Connecting NOT using MONGODB_ADDON_URI env, Service Binding....');
+            console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
+            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');            
+            var fullURL = bindings['url'].replace("%3D", "=")                        
+            mongoose.connect(fullURL, { ssl: true, useNewUrlParser: true })
+                .then(() => {
+                    console.log('Connected to the database !')
+                })
+                .catch((err) => {
+                    console.error(`Error connecting to the database. \n${err}`);
+                })
         }
     },
 
-    updateGauge : function() {
-        Values.count(function(err, result) {
-            if(!err) {
+    updateGauge: function () {
+        Values.count(function (err, result) {
+            if (!err) {
                 statsd.gauge('values', result);
             }
         })
     },
 
-    getVal : function(res) {
-        Values.find(function(err, result) {
+    getVal: function (res) {
+        Values.find(function (err, result) {
             if (err) {
                 console.log(err);
                 res.send('database error');
@@ -34,27 +47,27 @@ module.exports = {
                 var val = result[i];
                 values[val["_id"]] = val["value"]
             }
-            var title = process.env.TITLE || 'NodeJS MongoDB demo'
-            res.render('index', {title, values: values});
+            var title = process.env.TITLE || 'Benoit NodeJS MongoDB demo'
+            res.render('index', { title, values: values });
         });
     },
 
-    sendVal : function(val, res) {
-        var request = new Values({value: val});
+    sendVal: function (val, res) {
+        var request = new Values({ value: val });
         request.save((err, result) => {
             if (err) {
                 console.log(err);
-                res.send(JSON.stringify({status: "error", value: "Error, db request failed"}));
+                res.send(JSON.stringify({ status: "error", value: "Error, db request failed" }));
                 return
             }
             this.updateGauge();
             statsd.increment('creations');
-            res.status(201).send(JSON.stringify({status: "ok", value: result["value"], id: result["_id"]}));
+            res.status(201).send(JSON.stringify({ status: "ok", value: result["value"], id: result["_id"] }));
         });
     },
 
-    delVal : function(id) {
-        Values.remove({_id: id}, (err) => {
+    delVal: function (id) {
+        Values.remove({ _id: id }, (err) => {
             if (err) {
                 console.log(err);
             }
