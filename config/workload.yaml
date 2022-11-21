@@ -1,0 +1,20 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: expressjs-mongodb-statsd-example
+  labels:
+    apps.tanzu.vmware.com/workload-type: web
+    app.kubernetes.io/part-of: my-service-demo    
+spec:
+  source:
+    git:
+      url: https://github.com/bmoussaud/my-birds-svc
+      ref:
+        branch: main
+  env:
+    - name: env
+      value: development
+    - name: MONGODB_ADDON_URI
+      value: mongodb://sample-mongodb-account-beta:mMmWOSsEMniWDo9Uha1hrUMWae4g3Zzk3fzO2DBoMRHbtfeBWxsxCrcN4xRBJcHIwhfHNhN4Oj8oACDbNpNgdQ==@sample-mongodb-account-beta.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sample-mongodb-account-beta@
+      
+ 
