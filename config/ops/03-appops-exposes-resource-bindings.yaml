@@ -41,7 +41,7 @@ spec:
       matchLabels:
         services.apps.tanzu.vmware.com/class: azure-mongodb
   consumingNamespaces:
-  - '*'
+  - 'dev-tap'
 ---
 apiVersion: services.apps.tanzu.vmware.com/v1alpha1
 kind: ResourceClaim
