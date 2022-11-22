@@ -15,9 +15,8 @@ module.exports = {
         } else {
             console.log('Connecting NOT using MONGODB_ADDON_URI env, Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');            
-            var fullURL = bindings['url'].replace("%3D", "=")                        
-            mongoose.connect(fullURL, { ssl: true, useNewUrlParser: true })
+            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');                                      
+            mongoose.connect(bindings['url'] , { ssl: true, useNewUrlParser: true })
                 .then(() => {
                     console.log('Connected to the database !')
                 })
@@ -47,7 +46,7 @@ module.exports = {
                 var val = result[i];
                 values[val["_id"]] = val["value"]
             }
-            var title = process.env.TITLE || 'Benoit NodeJS MongoDB demo'
+            var title = process.env.TITLE || 'TAP NodeJS MongoDB demo'
             res.render('index', { title, values: values });
         });
     },
