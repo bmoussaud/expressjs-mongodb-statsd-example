@@ -9,4 +9,6 @@ kubectl create secret generic mongodb-credentials-manually-managed \
     -n mongodb-instances-fr
 kubectl label  secret  mongodb-credentials-manually-managed -n  mongodb-instances-fr  services.apps.tanzu.vmware.com/class=azure-mongodb
     
-    
+
+kubectl create secret generic game-config --from-literal=key1='value1'  --from-literal=key2='value2' --from-literal=ADMIN_ACCOUNTS='xxxxxxxxxx' -n dev-tap
+kubectl label  secret  mongodb-credentials-manually-managed -n  mongodb-instances-fr  services.apps.tanzu.vmware.com/class=azure-mongodb

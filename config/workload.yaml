@@ -3,7 +3,7 @@ kind: Workload
 metadata:
   name: simple-mongodb-app
   labels:
-    apps.tanzu.vmware.com/workload-type: web
+    apps.tanzu.vmware.com/workload-type: server
     app.kubernetes.io/part-of: simple-mongodb-app
 spec:
   source:
@@ -14,8 +14,36 @@ spec:
   env:
     - name: env
       value: development
-    - name: MONGODB_ADDON_URI_X
-      value: mongodb://sample-mongodb-account-beta:mMmWOSsEMniWDo9Uha1hrUMWae4g3Zzk3fzO2DBoMRHbtfeBWxsxCrcN4xRBJcHIwhfHNhN4Oj8oACDbNpNgdQ==@sample-mongodb-account-beta.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@sample-mongodb-account-beta@
+    - name: MONGODB_ADDON_URI
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: MONGODB_ADDON_URI
+    - name: ADMIN_ACCOUNTS
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: ADMIN_ACCOUNTS
+    - name: ADMIN_ORGCODE
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: ADMIN_ORGCODE
+    - name: COOKIE_SECRET
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: COOKIE_SECRET
+    - name: DB_CONNECTION_STRING
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: DB_CONNECTION_STRING
+    - name: DB_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: autfw-ui-config
+          key: DB_NAME
   serviceClaims:
     - name: mongodb-database
       ref:

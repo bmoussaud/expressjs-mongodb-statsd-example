@@ -9,14 +9,20 @@ var Values = mongoose.model('values', schema);
 
 module.exports = {
     connectDB: function () {
+        console.log("-----------------------------------------------")
+        console.log(" CHECK ENV COOKIE_SECRET")
+        console.log(process.env.COOKIE_SECRET)
+        console.log(" CHECK ENV DB_NAME")
+        console.log(process.env.DB_NAME)
+        console.log("-----------------------------------------------")
         if ("MONGODB_ADDON_URI" in process.env) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
             console.log('Connecting NOT using MONGODB_ADDON_URI env, Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');                                      
-            mongoose.connect(bindings['url'] , { ssl: true, useNewUrlParser: true })
+            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');
+            mongoose.connect(bindings['url'], { ssl: true, useNewUrlParser: true })
                 .then(() => {
                     console.log('Connected to the database !')
                 })
