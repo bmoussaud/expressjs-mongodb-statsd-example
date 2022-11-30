@@ -2,6 +2,8 @@ apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
   name: simple-mongodb-app
+  annotations:
+    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"my-mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'
   labels:
     apps.tanzu.vmware.com/workload-type: server
     app.kubernetes.io/part-of: simple-mongodb-app
@@ -13,44 +15,27 @@ spec:
         branch: main
   env:
     - name: env
-      value: development
-    - name: MONGODB_ADDON_URI
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: MONGODB_ADDON_URI
-    - name: ADMIN_ACCOUNTS
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: ADMIN_ACCOUNTS
-    - name: ADMIN_ORGCODE
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: ADMIN_ORGCODE
-    - name: COOKIE_SECRET
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: COOKIE_SECRET
-    - name: DB_CONNECTION_STRING
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: DB_CONNECTION_STRING
-    - name: DB_NAME
-      valueFrom:
-        configMapKeyRef:
-          name: autfw-ui-config
-          key: DB_NAME
+      value: development    
   serviceClaims:
-    - name: mongodb-database
+    - name: my-mongodb-database
       ref:
-        apiVersion: services.apps.tanzu.vmware.com/v1alpha1
-        kind: ResourceClaim
-        name: mongodb-database-remote
+        apiVersion: v1
+        kind: Secret
+        name: mongodb-credentials-azure-exposed
+    - name: app-config
+      ref:
+        apiVersion: v1
+        kind: Secret
+        name: fwui-app
   params:
+    - name: gitops_server_address
+      value: https://github.com/
+    - name: gitops_repository_owner
+      value: bmoussaud
+    - name: gitops_repository_name
+      value: micropets-app-gitops
+    - name: port
+      value: 8888
     - name: annotations
       value:
         autoscaling.knative.dev/minScale: "1"

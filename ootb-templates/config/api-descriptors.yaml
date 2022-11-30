@@ -1,0 +1,115 @@
+#@ load("@ytt:data", "data")
+
+#@ if/end "api-descriptors" not in data.values.excluded_templates:
+---
+apiVersion: carto.run/v1alpha1
+kind: ClusterConfigTemplate
+metadata:
+  name: api-descriptors
+  annotations:
+    doc: |
+
+spec:
+  configPath: .data
+
+  healthRule:
+    alwaysHealthy: {}
+
+  ytt: |
+    #@ load("@ytt:data", "data")
+    #@ load("@ytt:yaml", "yaml")
+    #@ load("@ytt:json", "json")
+    #@ load("@ytt:struct", "struct")
+
+    #@ def param(key):
+    #@   if not key in data.values.params:
+    #@     return None
+    #@   end
+    #@   return data.values.params[key]
+    #@ end
+
+    #@ def merge_labels(fixed_values):
+    #@   labels = {}
+    #@   if hasattr(data.values.workload.metadata, "labels"):
+    #@     labels.update(data.values.workload.metadata.labels)
+    #@   end
+    #@   labels.update(fixed_values)
+    #@   return labels
+    #@ end
+
+    #@ def merge_annotations(fixed_values):
+    #@   annotations = {}
+    #@   if hasattr(data.values.workload.metadata, "annotations"):
+    #@     # DEPRECATED: remove in a future release
+    #@     annotations.update(data.values.workload.metadata.annotations)
+    #@   end
+    #@   if type(param("annotations")) == "dict" or type(param("annotations")) == "struct":
+    #@     annotations.update(param("annotations"))
+    #@   end
+    #@   annotations.update(fixed_values)
+    #@   return annotations
+    #@ end
+
+    #@ def apiDescriptorBaseUrl(pod_runner):
+    #@ if hasattr(data.values.params["api_descriptor"].location, "baseURL"):
+    url: #@ data.values.params["api_descriptor"].location.baseURL
+    #@ else:
+    ref:
+      apiVersion: #@ pod_runner.apiVersion
+      kind: #@ pod_runner.kind
+      name: #@ pod_runner.metadata.name
+    #@ end
+    #@ end
+
+    #@ def apiDescriptor():
+    #@ for file in data.values.configs.app_def.config:
+    #@ for obj in data.values.configs.app_def.config[file].split("\n---\n"):
+    #@ pod_runner = struct.encode(yaml.decode(obj))
+    #@ if not (hasattr(pod_runner, "metadata") and hasattr(pod_runner.metadata, "annotations")):
+    #@   continue
+    #@ end
+    #@ if not hasattr(pod_runner.metadata.annotations, "ootb.apps.tanzu.vmware.com/apidescriptor-ref"):
+    #@   continue
+    #@ end
+    #@ if not pod_runner.metadata.annotations["ootb.apps.tanzu.vmware.com/apidescriptor-ref"]:
+    #@   continue
+    #@ end
+
+    #@ descriptor = param("api_descriptor")
+
+    ---
+    apiVersion: apis.apps.tanzu.vmware.com/v1alpha1
+    kind: APIDescriptor
+    metadata:
+      name: #@ data.values.workload.metadata.name
+      annotations: #@ merge_annotations({})
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
+    spec:
+      type: #@ descriptor.type
+      description: #@ descriptor.description
+      system: #@ descriptor.system
+      owner: #@ descriptor.owner
+      location:
+        path: #@ descriptor.location.path
+        baseURL: #@ apiDescriptorBaseUrl(pod_runner)
+    #@ end
+    #@ end
+    #@ end
+
+    #@ def add_api_descriptors():
+    #@ if hasattr(data.values.workload.metadata, "labels") and hasattr(data.values.workload.metadata.labels, "apis.apps.tanzu.vmware.com/register-api") and data.values.workload.metadata.labels["apis.apps.tanzu.vmware.com/register-api"] == "true":
+    #@    new_data = struct.decode(data.values.configs.app_def.config)
+    #@    new_data.update({"apiDescriptor.yml": yaml.encode(apiDescriptor())})
+    #@    return new_data
+    #@ else:
+    #@    return struct.decode(data.values.configs.app_def.config)
+    #@ end
+    #@ end
+
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: #@ data.values.workload.metadata.name + "-with-api-descriptors"
+      labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
+    data: #@ add_api_descriptors()

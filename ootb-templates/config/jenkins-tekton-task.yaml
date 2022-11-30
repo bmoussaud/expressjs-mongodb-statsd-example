@@ -1,0 +1,56 @@
+#@ load("@ytt:data", "data")
+
+#@ if/end "jenkins-task" not in data.values.excluded_templates:
+---
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: jenkins-task
+spec:
+  results:
+  - name: jenkins-job-url
+  params:
+  - name: source-url
+  - name: source-revision
+  - name: secret-name
+  - name: job-name
+  - name: job-params
+    default: ""
+  steps:
+    - name: trigger-jenkins-build
+      image: dev.registry.tanzu.vmware.com/tap-integrations/jenkins-adapter:0.1.2
+      args: [
+        "/trigger",
+        "-job",
+        "$(params.job-name)",
+        "-job-url-result-path",
+        "/tekton/results/jenkins-job-url",
+        "-parameters",
+        "$(params.job-params)"
+      ]
+      env:
+      - name: JENKINS_HOST_URL
+        valueFrom:
+          secretKeyRef:
+            name: $(params.secret-name)
+            key: url
+      - name: JENKINS_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: $(params.secret-name)
+            key: username
+      - name: JENKINS_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: $(params.secret-name)
+            key: password
+      - name: JENKINS_CA_CERT
+        valueFrom:
+          secretKeyRef:
+            name: $(params.secret-name)
+            key: ca-cert
+            optional: true
+      - name: source-url
+        value: $(params.source-url)
+      - name: source-revision
+        value: $(params.source-revision)
