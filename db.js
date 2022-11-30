@@ -4,21 +4,31 @@ const serviceBindings = require('kube-service-bindings');
 const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
+const cookieParser = require('cookie-parser');
 
 var schema = mongoose.Schema({ value: String });
 var Values = mongoose.model('values', schema);
 
 
+function bindingsToMongoDbUrl(binding) {
+    return ['mongodb', '://', `${binding.username}`, ':', `${binding.password}`, '@', `${binding.host}`, `:${binding.port}`].join('');
+}
+
 module.exports = {
-    connectDB: function () {        
+    connectDB: function () {
         console.log("loadConfiguration -----------------------------------------------")
-        csb.loadConfiguration("fwui-config")
+        const appBindings = csb.getBindingConfiguration("app-configuration", "my-fwui-config")
+        //load the applications bindings as environment variables
+        Object.entries(appBindings).forEach(([k, v]) => { process.env[k] = v })
+
         console.log("---CHECK ENV DB_NAME")
         console.log(process.env.DB_NAME)
         console.log("---CHECK ENV DB_CONNECTION_STRING")
         console.log(process.env.DB_CONNECTION_STRING)
         console.log("--> CHECK ENV COOKIE_SECRET")
         console.log(process.env.COOKIE_SECRET)
+        console.log("--> CHECK ENV MONGODB_ADDON_URI")
+        console.log(process.env.MONGODB_ADDON_URI)
         console.log("XXX-----------------------------------------------")
         if ("MONGODB_ADDON_URI" in process.env) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
@@ -26,8 +36,10 @@ module.exports = {
         } else {
             console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');
-            mongoose.connect(bindings['url'], { ssl: true, useNewUrlParser: true })
+            const mongoDbBindings = csb.getBindingConfiguration("mongodb", "mongodb-database")
+            const uri = bindingsToMongoDbUrl(mongoDbBindings)
+            console.log(uri)
+            mongoose.connect(uri, { ssl: true, useNewUrlParser: true })
                 .then(() => {
                     console.log('Connected to the database !')
                 })

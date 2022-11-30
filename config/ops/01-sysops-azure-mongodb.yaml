@@ -16,7 +16,7 @@ spec:
 apiVersion: documentdb.azure.com/v1beta20210515
 kind: DatabaseAccount
 metadata:
-  name: sample-mongodb-account-beta
+  name: simple-mongodb-app-db-account
   namespace: mongodb-instances-fr
 spec:
   location: francecentral
@@ -42,17 +42,17 @@ spec:
 apiVersion: documentdb.azure.com/v1beta20210515
 kind: MongodbDatabase
 metadata:
-  name: sample-db-mongodb-beta
+  name: simple-mongodb-app-db
   namespace: mongodb-instances-fr
 spec:
   location: francecentral
   owner:
-    name: sample-mongodb-account-beta
+    name: simple-mongodb-app-db-account
   options:
     autoscaleSettings:
       maxThroughput: 4000
   resource:
-    id: sample-db-mongodb-beta
+    id: simple-mongodb-app-db
 ---
 apiVersion: documentdb.azure.com/v1beta20210515
 kind: MongodbDatabaseCollection
@@ -62,7 +62,7 @@ metadata:
 spec:
   location: francecentral
   owner:
-    name: sample-db-mongodb-beta
+    name: simple-mongodb-app-db
   options:
     throughput: 400
   resource:
@@ -95,7 +95,7 @@ metadata:
   namespace: mongodb-instances-fr
 spec:
   owner:
-    name: sample-db-mongodb-beta
+    name: simple-mongodb-app-db
   resource:
     autoscaleSettings:
       maxThroughput: 4000

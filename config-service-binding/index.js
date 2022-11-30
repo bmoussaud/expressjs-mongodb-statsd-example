@@ -1,29 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 
-function isDefined(x) {
-    return !(typeof x === 'undefined' || x === null);
-}
-
-function loadConfiguration(id) {
-    console.log("--> loadConfiguration")
+function getBindingConfiguration(type, id) {
     const root = process.env.SERVICE_BINDING_ROOT;
-    const bindingDataPath = getBindingDataPath(root, "app-configuration", id)
+    const bindingDataPath = getBindingDataPath(root, type, id)
     if (!isDefined(bindingDataPath)) {
         throw new Error('No Binding Found for app-configuration/' + id);
     }
-    console.log(bindingDataPath)
     bindingData = getBindingData(bindingDataPath)
-    console.log(bindingData)
-
     const binding = {};
+    bindingData.forEach(([mappedKey, mappedValue]) => { binding[mappedKey] = mappedValue });
+    return binding
+}
 
-    bindingData
-        .forEach(([mappedKey, mappedValue]) =>
-            //binding[mappedKey] = mappedValue        
-            process.env[mappedKey] = mappedValue
-        );
-    console.log("<-- loadConfiguration")
+function isDefined(x) {
+    return !(typeof x === 'undefined' || x === null);
 }
 
 function getBindingDataPath(root, type, id) {
@@ -49,15 +40,9 @@ function getBindingData(bindingDataPath) {
         .filter((filename) => !filename.startsWith('..'))
         .map((filename) => [
             filename,
-            getBindValue(path.join(bindingDataPath, filename))
+            fs.readFileSync(path.join(bindingDataPath, filename)).toString().trim()
         ]);
 }
 
-function getBindValue(filepath) {
-    const filename = path.basename(filepath);
-    //console.log("getBindValue " + filepath)
-    return fs.readFileSync(filepath).toString().trim();
-}
-
-module.exports.loadConfiguration = loadConfiguration;
+module.exports.getBindingConfiguration = getBindingConfiguration;
 

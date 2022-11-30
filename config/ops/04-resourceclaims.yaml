@@ -19,14 +19,14 @@ metadata:
   labels:
     servicebinding.io/controller: "true"
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - get
-      - list
-      - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
 ---
 apiVersion: services.apps.tanzu.vmware.com/v1alpha1
 kind: ResourceClaimPolicy
@@ -41,4 +41,29 @@ spec:
       matchLabels:
         services.apps.tanzu.vmware.com/class: azure-mongodb
   consumingNamespaces:
-    - "dev-tap"
+  - 'dev-tap'
+---
+apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+kind: ResourceClaim
+metadata:
+  name: mongodb-database-azure-exposed
+  namespace: dev-tap
+spec:
+  ref:
+    apiVersion: v1
+    kind: Secret
+    name: mongodb-credentials-azure-exposed
+    namespace: mongodb-instances-fr
+---
+apiVersion: services.apps.tanzu.vmware.com/v1alpha1
+kind: ResourceClaim
+metadata:
+  name: mongodb-database-remote
+  namespace: dev-tap
+spec:
+  ref:
+    apiVersion: v1
+    kind: Secret
+    name: mongodb-credentials-manually-managed
+    namespace: mongodb-instances-fr
+

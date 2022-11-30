@@ -3,9 +3,9 @@ kind: Workload
 metadata:
   name: simple-mongodb-app
   annotations:
-    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"my-mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'
+    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'
   labels:
-    apps.tanzu.vmware.com/workload-type: server
+    apps.tanzu.vmware.com/workload-type: web
     app.kubernetes.io/part-of: simple-mongodb-app
 spec:
   source:
@@ -17,12 +17,12 @@ spec:
     - name: env
       value: development
   serviceClaims:
-    - name: fwui-config
+    - name: my-fwui-config
       ref:
         apiVersion: v1
         kind: Secret
         name: secured-autfw-ui-config
-    - name: my-mongodb-database
+    - name: mongodb-database
       ref:
         apiVersion: v1
         kind: Secret
