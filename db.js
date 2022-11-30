@@ -24,7 +24,7 @@ module.exports = {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
-            console.log('Connecting NOT using MONGODB_ADDON_URI env, Service Binding....');
+            console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
             const bindings = serviceBindings.getBinding('MONGODB', 'mongoose');
             mongoose.connect(bindings['url'], { ssl: true, useNewUrlParser: true })
