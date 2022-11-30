@@ -10,22 +10,15 @@ var Values = mongoose.model('values', schema);
 
 
 module.exports = {
-    connectDB: function () {
-        process.env.TOTO = "BENOIT"
-        console.log("-----------------------------------------------")
-        console.log("CHECK ENV COOKIE_SECRET")
-        console.log(process.env.COOKIE_SECRET)
-        console.log("CHECK ENV DB_NAME DB_NAME_WORKLOAD")
-        console.log(process.env.DB_NAME_WORKLOAD)
-        console.log("---CHECK ENV DB_NAME..... Service bindings")
-        console.log(process.env.DB_NAME)
-        console.log("-----------------------------------------------")
-        process.env.TOTO = "BENOIT2"
-        console.log(process.env.TOTO)
-        console.log("-----------------------------------------------")
+    connectDB: function () {        
+        console.log("loadConfiguration -----------------------------------------------")
         csb.loadConfiguration("fwui-config")
-        console.log(process.env.username)
-        console.log(process.env.password)
+        console.log("---CHECK ENV DB_NAME")
+        console.log(process.env.DB_NAME)
+        console.log("---CHECK ENV DB_CONNECTION_STRING")
+        console.log(process.env.DB_CONNECTION_STRING)
+        console.log("--> CHECK ENV COOKIE_SECRET")
+        console.log(process.env.COOKIE_SECRET)
         console.log("XXX-----------------------------------------------")
         if ("MONGODB_ADDON_URI" in process.env) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');

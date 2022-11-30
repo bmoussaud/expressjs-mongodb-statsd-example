@@ -15,18 +15,18 @@ spec:
         branch: main
   env:
     - name: env
-      value: development    
+      value: development
   serviceClaims:
+    - name: fwui-config
+      ref:
+        apiVersion: v1
+        kind: Secret
+        name: secured-autfw-ui-config
     - name: my-mongodb-database
       ref:
         apiVersion: v1
         kind: Secret
         name: mongodb-credentials-azure-exposed
-    - name: app-config
-      ref:
-        apiVersion: v1
-        kind: Secret
-        name: fwui-app
   params:
     - name: gitops_server_address
       value: https://github.com/
