@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var statsd = require('./statsd');
-const serviceBindings = require('kube-service-bindings');
 const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
