@@ -3,6 +3,7 @@ var statsd = require('./statsd');
 const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
+var ksb = require('kube-service-bindings');
 const cookieParser = require('cookie-parser');
 
 var schema = mongoose.Schema({ value: String });
@@ -15,8 +16,13 @@ function bindingsToMongoDbUrl(binding) {
 
 module.exports = {
     connectDB: function () {
-        console.log("loadConfiguration -----------------------------------------------")
-        const appBindings = csb.getBindingConfiguration("app-configuration", "my-fwui-config")
+
+        ksb.getBinding()
+        console.log("loadConfiguration -----------------------------------------------")        
+        
+        const appBindings = ksb.getBinding().find(function (item) {
+            return item['type'] == 'app-configuration'
+        })         
         //load the applications bindings as environment variables
         Object.entries(appBindings).forEach(([k, v]) => { process.env[k] = v })
 
@@ -29,14 +35,20 @@ module.exports = {
         console.log("--> CHECK ENV MONGODB_ADDON_URI")
         console.log(process.env.MONGODB_ADDON_URI)
         console.log("XXX-----------------------------------------------")
+
+        if (appBindings === undefined) {
+            throw new Error("app-configuration not found");
+        }   
         if ("MONGODB_ADDON_URI" in process.env) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
             console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const mongoDbBindings = csb.getBindingConfiguration("mongodb", "mongodb-database")
-            const uri = bindingsToMongoDbUrl(mongoDbBindings)
+            //const mongoDbBindings = csb.getBindingConfiguration("mongodb", "mongodb-database")
+            //const uri = bindingsToMongoDbUrl(mongoDbBindings)
+            const bindings = ksb.getBinding('MONGODB', 'mongoose');
+            const uri = bindings['url']
             console.log(uri)
             mongoose.connect(uri, { ssl: true, useNewUrlParser: true })
                 .then(() => {
