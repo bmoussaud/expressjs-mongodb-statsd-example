@@ -6,8 +6,8 @@ block content
       a(href='https://github.com/bmoussaud/expressjs-mongodb-statsd-example') Fork me on GitHub
 
   nav.navbar.navbar-default( role="navigation" )
-    .navbar-header
-      a.navbar-brand(href="#") #{title} 😭
+    .navbar-header      
+      a.navbar-brand(href="#") #{title} 
 
   form.form-inline(align="center" id="createForm" method="post" action="/values")
     div.form-group
@@ -15,15 +15,16 @@ block content
       button.btn.btn-success(type="submit" id="create") Submit
 
   br
-
+  
   div(align="center")
-    ul.list-group(id="list" style="width:400px")
+    ul.list-group(id="list" style="width:400px")      
       li.list-group-item.active Values
       each val, uuid in values
         li.list-group-item(id=uuid)
           div(align="right" style="float:right")
             button.btn.btn-danger.btn-xs(id="btn-" + uuid onClick="deleteItem(this.id)") Delete
           div(align="left")= val
+      img(src='img/logo.svg')
 
   div.modal.fade.modal-error(tabindex="-1" role="dialog" aria-labelledby="errorModal" id="errorModal")
     div.modal-dialog

@@ -6,3 +6,6 @@ target
 config
 node_modules
 .vscode
+bindings
+
+
