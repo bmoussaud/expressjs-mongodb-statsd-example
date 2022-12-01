@@ -17,14 +17,16 @@ block content
   br
   
   div(align="center")
-    ul.list-group(id="list" style="width:400px")      
-      li.list-group-item.active Values
-      each val, uuid in values
-        li.list-group-item(id=uuid)
-          div(align="right" style="float:right")
-            button.btn.btn-danger.btn-xs(id="btn-" + uuid onClick="deleteItem(this.id)") Delete
-          div(align="left")= val
-      img(src='img/logo.svg')
+    div(align="left" style="width:400px")
+      ul.list-group(id="list" )      
+        li.list-group-item.active Values
+        each val, uuid in values
+          li.list-group-item(id=uuid)
+            div(align="right" style="float:right")
+              button.btn.btn-danger.btn-xs(id="btn-" + uuid onClick="deleteItem(this.id)") Delete
+            div(align="left")= val
+    div(align="right" style="width:400px")
+        img(src='img/logo.svg')
 
   div.modal.fade.modal-error(tabindex="-1" role="dialog" aria-labelledby="errorModal" id="errorModal")
     div.modal-dialog
