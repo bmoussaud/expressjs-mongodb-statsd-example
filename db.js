@@ -3,11 +3,9 @@ var statsd = require('./statsd');
 const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
-const cookieParser = require('cookie-parser');
 
 var schema = mongoose.Schema({ value: String });
 var Values = mongoose.model('values', schema);
-
 
 function bindingsToMongoDbUrl(binding) {
     return ['mongodb', '://', `${binding.username}`, ':', `${binding.password}`, '@', `${binding.host}`, `:${binding.port}`].join('');
@@ -15,13 +13,13 @@ function bindingsToMongoDbUrl(binding) {
 
 module.exports = {
     connectDB: function () {
-        if ("MONGODB_ADDON_URI_X" in process.env) {
+        if (! process.env.MONGODB_ADDON_URI === undefined) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
             console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const mongoDbBindings = csb.getBindingConfiguration("mongodb", "mongodb-database")
+            const mongoDbBindings = csb.getBindingConfiguration("mongodb")            
             console.log(mongoDbBindings)
             const uri = bindingsToMongoDbUrl(mongoDbBindings)
             console.log(uri)
