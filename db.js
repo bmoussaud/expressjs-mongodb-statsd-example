@@ -19,7 +19,7 @@ module.exports = {
         } else {
             console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const mongoDbBindings = csb.getBindingConfiguration("mongodb")            
+            const mongoDbBindings = csb.bindings("mongodb")            
             console.log(mongoDbBindings)
             const uri = bindingsToMongoDbUrl(mongoDbBindings)
             console.log(uri)

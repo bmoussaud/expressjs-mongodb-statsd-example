@@ -1,11 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
+function bindings(type, id) {
+    return getBindingConfiguration(type, id)
+}
 function getBindingConfiguration(type, id) {
     const root = process.env.SERVICE_BINDING_ROOT
     if (root === undefined) {
         throw Error("Please set env SERVICE_BINDING_ROOT to use service bindings")
-    }    
+    }
     const bindingDataPath = getBindingDataPath(root, type, id)
     if (!isDefined(bindingDataPath)) {
         throw new Error('No Binding Found for app-configuration/' + id);
@@ -50,5 +53,8 @@ function getBindingData(bindingDataPath) {
         ]);
 }
 
-module.exports.getBindingConfiguration = getBindingConfiguration;
 
+module.exports = {
+    getBindingConfiguration,
+    bindings
+}
