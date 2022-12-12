@@ -1,17 +1,19 @@
 apiVersion: carto.run/v1alpha1
 kind: ClusterConfigTemplate
 metadata:
-  name: server-template-custom
+  name: custom-server-template
 spec:
   configPath: ".data"
   healthRule:
     alwaysHealthy: {}
   params:
-  - default:
-    - containerPort: 8080
-      name: http
-      port: 8080
-    name: ports
+    - default:
+        - containerPort: 8080
+          name: http
+          port: 8080
+      name: ports
+    - default: "notprovided.aramco.co"
+      name: "fqdn"
   ytt: |
     #@ load("@ytt:data", "data")
     #@ load("@ytt:yaml", "yaml")
@@ -26,6 +28,20 @@ spec:
     #@   labels.update(fixed_values)
     #@   return labels
     #@ end
+
+    #@ def prefix_x():
+    #@   prefix = "/" 
+    #@   if hasattr(data.values.params, "prefix"):
+    #@     return prefix+ data.values.params.prefix
+    #@   else:
+    #@     return prefix+ data.values.metadata.name
+    #@   end
+    #@ end
+
+    #@ def prefix():
+    #@   return "/" + getattr(data.values.params, "prefix", data.values.workload.metadata.name)     
+    #@ end
+
 
     #@ def intOrString(v):
     #@   return v if type(v) == "int" else int(v.strip()) if v.strip().isdigit() else v
@@ -93,16 +109,16 @@ spec:
     spec:
       routes:
       - conditions:
-        - prefix: #@ "/" + data.values.params.httpproxyappprefix
+        - prefix: #@ prefix()
         pathRewritePolicy:
           replacePrefix:
-          - prefix: #@ "/" + data.values.params.httpproxyappprefix
-            replacement: #@ "/" + data.values.params.httpproxyappreplacement
+          - prefix: #@ prefix()
+            replacement: #@ "/" 
         services:
         - name: #@ data.values.workload.metadata.name
-          port: 8080
+          port: #@ intOrString(data.values.params.ports[0].port)
       virtualhost:
-        fqdn: #@ data.values.params.httpproxyurl
+        fqdn: #@ data.values.params.fqdn
     #@ end
     ---
     apiVersion: v1

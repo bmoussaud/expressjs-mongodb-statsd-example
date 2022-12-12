@@ -5,9 +5,10 @@ metadata:
   annotations:
     serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'
   labels:
-    apps.tanzu.vmware.com/workload-type: web
+    apps.tanzu.vmware.com/workload-type: custom-server
     app.kubernetes.io/part-of: simple-mongodb-app
 spec:
+  serviceAccount: tap-default
   source:
     git:
       url: https://github.com/bmoussaud/simple-mongodb-app
@@ -16,6 +17,10 @@ spec:
   env:
     - name: env
       value: development
+  build:
+    env:
+      - name: BP_LOG_LEVEL
+        value: DEBUG
   serviceClaims:
     - name: my-fwui-config
       ref:
@@ -28,14 +33,14 @@ spec:
         kind: Secret
         name: mongodb-credentials-azure-exposed
   params:
+    - name: fqdn
+      value: www.dev-tap.tap3.eu.aks.mytanzu.xyz   
     - name: gitops_server_address
       value: https://github.com/
     - name: gitops_repository_owner
       value: bmoussaud
     - name: gitops_repository_name
       value: micropets-app-gitops
-    - name: port
-      value: 8888
     - name: annotations
       value:
         autoscaling.knative.dev/minScale: "1"

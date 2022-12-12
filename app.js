@@ -57,7 +57,7 @@ app.use(function (err, req, res, next) {
   });
 });
 
-console.log("-ALL-")
+
 const all = csb.all_bindings()
 console.log(all)
 console.log("-->loadConfiguration -----------------------------------------------")
