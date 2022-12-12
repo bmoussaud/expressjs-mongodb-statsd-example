@@ -35,6 +35,8 @@ spec:
   params:
     - name: fqdn
       value: www.dev-tap.tap3.eu.aks.mytanzu.xyz   
+    - name: prefix
+      value: my-custom-prefix
     - name: gitops_server_address
       value: https://github.com/
     - name: gitops_repository_owner
