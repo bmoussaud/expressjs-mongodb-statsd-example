@@ -3,7 +3,7 @@ kind: Workload
 metadata:
   name: simple-mongodb-app
   annotations:
-    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'
+    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'    
   labels:
     apps.tanzu.vmware.com/workload-type: custom-server
     app.kubernetes.io/part-of: simple-mongodb-app
