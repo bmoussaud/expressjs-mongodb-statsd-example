@@ -3,7 +3,7 @@ kind: Workload
 metadata:
   name: simple-mongodb-app
   annotations:
-    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb-instances-fr"}}}}'    
+    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb"}}}}'    
   labels:
     apps.tanzu.vmware.com/workload-type: custom-server
     app.kubernetes.io/part-of: simple-mongodb-app
@@ -31,7 +31,7 @@ spec:
       ref:
         apiVersion: v1
         kind: Secret
-        name: mongodb-credentials-azure-exposed
+        name: todo-mongodb-credentials-exposed
   params:
     - name: fqdn
       value: www.dev-tap.tap3.eu.aks.mytanzu.xyz   

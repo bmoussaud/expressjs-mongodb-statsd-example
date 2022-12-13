@@ -8,22 +8,27 @@ var schema = mongoose.Schema({ value: String });
 var Values = mongoose.model('values', schema);
 
 function bindingsToMongoDbUrl(binding) {
-    return ['mongodb', '://', `${binding.username}`, ':', `${binding.password}`, '@', `${binding.host}`, `:${binding.port}`].join('');
+    if ("connectionString" in binding) {
+        return binding.connectionString
+    }
+    else {
+        return ['mongodb', '://', `${binding.username}`, ':', `${binding.password}`, '@', `${binding.host}`, `:${binding.port}`].join('');
+    }
 }
 
 module.exports = {
     connectDB: function () {
-        if (! process.env.MONGODB_ADDON_URI === undefined) {
+        if (!process.env.MONGODB_ADDON_URI === undefined) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
         } else {
             console.log('Connecting Using Service Binding....');
             console.log("check if the deployment has been bound to a mongodb instance through service bindings. If so use that connect info")
-            const mongoDbBindings = csb.bindings("mongodb")            
+            const mongoDbBindings = csb.bindings("mongodb")
             console.log(mongoDbBindings)
             const uri = bindingsToMongoDbUrl(mongoDbBindings)
             console.log(uri)
-            mongoose.connect(uri, { ssl: true, useNewUrlParser: true })
+            mongoose.connect(uri, { ssl: false, useNewUrlParser: true })
                 .then(() => {
                     console.log('Connected to the database !')
                 })
