@@ -18,6 +18,7 @@ function bindingsToMongoDbUrl(binding) {
 
 module.exports = {
     connectDB: function () {
+        console.log("--> connectDB")
         if (!process.env.MONGODB_ADDON_URI === undefined) {
             console.log('Connecting using MONGODB_ADDON_URI env: ');
             mongoose.connect(process.env.MONGODB_ADDON_URI, { useNewUrlParser: true });
@@ -28,6 +29,7 @@ module.exports = {
             console.log(mongoDbBindings)
             const uri = bindingsToMongoDbUrl(mongoDbBindings)
             console.log(uri)
+            //TODO:mage ssl:false when using the local mongodatabase and :true when using the azure mongodatabase
             mongoose.connect(uri, { ssl: false, useNewUrlParser: true })
                 .then(() => {
                     console.log('Connected to the database !')

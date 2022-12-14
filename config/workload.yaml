@@ -3,9 +3,10 @@ kind: Workload
 metadata:
   name: simple-mongodb-app
   annotations:
-    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb"}}}}'    
+    serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb"}}}}'
   labels:
-    apps.tanzu.vmware.com/workload-type: custom-server
+    apps.tanzu.vmware.com/workload-type-x: custom-server
+    apps.tanzu.vmware.com/workload-type: web
     app.kubernetes.io/part-of: simple-mongodb-app
 spec:
   serviceAccount: tap-default
@@ -14,13 +15,6 @@ spec:
       url: https://github.com/bmoussaud/simple-mongodb-app
       ref:
         branch: main
-  env:
-    - name: env
-      value: development
-  build:
-    env:
-      - name: BP_LOG_LEVEL
-        value: DEBUG
   serviceClaims:
     - name: my-fwui-config
       ref:
@@ -34,7 +28,7 @@ spec:
         name: todo-mongodb-credentials-exposed
   params:
     - name: fqdn
-      value: www.dev-tap.tap3.eu.aks.mytanzu.xyz   
+      value: www.dev-tap.tap3.eu.aks.mytanzu.xyz
     - name: prefix
       value: my-custom-prefix
     - name: gitops_server_address
