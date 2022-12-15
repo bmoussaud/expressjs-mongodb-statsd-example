@@ -60,7 +60,7 @@ app.use(function (err, req, res, next) {
 
 const all = csb.all_bindings()
 console.log(all)
-console.log("-->loadConfiguration -----------------------------------------------")
+console.log("-->>>loadConfiguration -----------------------------------------------")
 const appBindings = csb.bindings("app-configuration")
 //load the applications bindings as environment variables
 console.log(appBindings)

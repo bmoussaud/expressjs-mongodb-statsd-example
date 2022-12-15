@@ -1,11 +1,21 @@
 var mongoose = require('mongoose');
 var statsd = require('./statsd');
+var os = require("os");
 const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
 
 var schema = mongoose.Schema({ value: String });
 var Values = mongoose.model('values', schema);
+
+var schemaPet = mongoose.Schema({
+    Name: String,
+    Kind: String,
+    Age: Number,
+    URL: String,
+    From: String
+});
+var ValuesPets = mongoose.model('valuesPets', schemaPet);
 
 function bindingsToMongoDbUrl(binding) {
     if ("connectionString" in binding) {
@@ -88,5 +98,76 @@ module.exports = {
             this.updateGauge();
             statsd.increment('deletions');
         });
+    },
+
+    getPets: function (res) {
+        return ValuesPets.find(function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send('database error');
+                return
+            }
+            var pets = []
+            for (var i in result) {
+                var val = result[i];
+                pets.push({
+                    Index: val['_id'],
+                    Name: val['Name'],
+                    Kind: val['Kind'],
+                    Age: val['Age'],
+                    URL: val['URL'],
+                    From: "",
+                    URI: "elephants/v1/data/" + val['_id']
+                })
+            }
+            res.status(201).send(JSON.stringify({ Total: pets.length, Hostname: os.hostname(), Pets: pets }));
+
+        });
+    },
+
+    getPet: function (res, uuid) {
+        return ValuesPets.findById(uuid, function (err, result) {
+            if (err) {
+                console.log(err);
+                res.send('database error');
+                return
+            }
+            var val = result
+            res.status(201).send(JSON.stringify({
+                Index: val['_id'],
+                Name: val['Name'],
+                Kind: val['Kind'],
+                Age: val['Age'],
+                URL: val['URL'],
+                From: "",
+                URI: "elephants/v1/data/" + val['_id']
+            }));
+        });
+    },
+
+    sendPet: function (name, kind, age, url) {
+        var request = new ValuesPets({
+            Name: name,
+            Kind: kind,
+            Age: age,
+            URL: url,
+            From: ""
+        });
+        request.save((err, result) => {
+            if (err) {
+                console.log(err);
+                res.send(JSON.stringify({ status: "error", value: "Error, db request failed" }));
+                return
+            }
+            statsd.increment('creationsPets');
+        });
+    },
+
+    deleteAllPets: function () {
+        ValuesPets.deleteMany().then(function () {
+            console.log("Pet sData deleted"); // Success
+        })
+        statsd.increment('deletionPets');
     }
+
 };
