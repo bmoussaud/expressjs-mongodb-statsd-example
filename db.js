@@ -117,7 +117,7 @@ module.exports = {
                     Age: val['Age'],
                     URL: val['URL'],
                     From: "",
-                    URI: "elephants/v1/data/" + val['_id']
+                    URI: "/elephants/v1/data/" + val['_id']
                 })
             }
             res.status(201).send(JSON.stringify({ Total: pets.length, Hostname: os.hostname(), Pets: pets }));
@@ -140,7 +140,7 @@ module.exports = {
                 Age: val['Age'],
                 URL: val['URL'],
                 From: "",
-                URI: "elephants/v1/data/" + val['_id']
+                URI: "/elephants/v1/data/" + val['_id']
             }));
         });
     },

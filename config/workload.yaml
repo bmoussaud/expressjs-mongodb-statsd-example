@@ -1,13 +1,13 @@
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
-  name: simple-mongodb-app
+  name: elephants
   annotations:
     serviceclaims.supplychain.apps.x-tanzu.vmware.com/extensions: '{"kind":"ServiceClaimsExtension","apiVersion":"supplychain.apps.x-tanzu.vmware.com/v1alpha1","spec":{"serviceClaims":{"mongodb-database":{"namespace":"mongodb"}}}}'
   labels:
     apps.tanzu.vmware.com/workload-type-x: custom-server
     apps.tanzu.vmware.com/workload-type: web
-    app.kubernetes.io/part-of: simple-mongodb-app
+    app.kubernetes.io/part-of: elephants   
     micropets/kind: backend
 spec:
   serviceAccount: tap-default
