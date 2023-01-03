@@ -101,6 +101,7 @@ module.exports = {
     },
 
     getPets: function (res) {
+        
         return ValuesPets.find(function (err, result) {
             if (err) {
                 console.log(err);

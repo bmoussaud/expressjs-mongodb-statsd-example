@@ -4,7 +4,7 @@ var mongodb = require('../db');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function (req, res) {
+router.get('/', function (req, res) {  
   mongodb.getVal(res);
 });
 
