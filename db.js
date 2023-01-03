@@ -5,9 +5,6 @@ const { options } = require('mongoose');
 
 var csb = require('./config-service-binding');
 
-var schema = mongoose.Schema({ value: String });
-var Values = mongoose.model('values', schema);
-
 var schemaPet = mongoose.Schema({
     Name: String,
     Kind: String,
@@ -51,57 +48,9 @@ module.exports = {
         }
     },
 
-    updateGauge: function () {
-        Values.count(function (err, result) {
-            if (!err) {
-                statsd.gauge('values', result);
-            }
-        })
-    },
-
-    getVal: function (res) {
-        Values.find(function (err, result) {
-            if (err) {
-                console.log(err);
-                res.send('database error');
-                return
-            }
-            var values = {};
-            for (var i in result) {
-                var val = result[i];
-                values[val["_id"]] = val["value"]
-            }
-            var title = process.env.TITLE || 'TAPTAP NodeJS MongoDB demo'
-            res.render('index', { title, values: values });
-        });
-    },
-
-    sendVal: function (val, res) {
-        var request = new Values({ value: val });
-        request.save((err, result) => {
-            if (err) {
-                console.log(err);
-                res.send(JSON.stringify({ status: "error", value: "Error, db request failed" }));
-                return
-            }
-            this.updateGauge();
-            statsd.increment('creations');
-            res.status(201).send(JSON.stringify({ status: "ok", value: result["value"], id: result["_id"] }));
-        });
-    },
-
-    delVal: function (id) {
-        Values.remove({ _id: id }, (err) => {
-            if (err) {
-                console.log(err);
-            }
-            this.updateGauge();
-            statsd.increment('deletions');
-        });
-    },
 
     getPets: function (res) {
-        
+
         return ValuesPets.find(function (err, result) {
             if (err) {
                 console.log(err);
@@ -109,6 +58,7 @@ module.exports = {
                 return
             }
             var pets = []
+            var from = process.env.ENV || 'AKS/4'
             for (var i in result) {
                 var val = result[i];
                 pets.push({
@@ -117,7 +67,7 @@ module.exports = {
                     Kind: val['Kind'],
                     Age: val['Age'],
                     URL: val['URL'],
-                    From: "",
+                    From: from,
                     URI: "/elephants/v1/data/" + val['_id']
                 })
             }
@@ -134,13 +84,15 @@ module.exports = {
                 return
             }
             var val = result
+            var from = process.env.ENV || 'AKS/4'
             res.status(201).send(JSON.stringify({
                 Index: val['_id'],
                 Name: val['Name'],
                 Kind: val['Kind'],
                 Age: val['Age'],
                 URL: val['URL'],
-                From: "",
+                From: from,
+
                 URI: "/elephants/v1/data/" + val['_id']
             }));
         });
